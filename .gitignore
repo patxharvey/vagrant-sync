@@ -9,6 +9,9 @@ logs/
 # Backup files
 backups/
 
+# Locations
+locations.cfg
+
 # Temporary files and directories
 *.tmp
 *.bak
