@@ -1,0 +1,33 @@
+# Vagrant-specific ignores
+.vagrant/
+*.box
+
+# Log files and directories
+logs/
+*.log
+
+# Backup files
+backups/
+
+# Temporary files and directories
+*.tmp
+*.bak
+*.swp
+
+# Personal shell history
+.bash_history
+
+# Cache files
+.cache/
+
+# SSH configurations
+.ssh/
+
+# Vim editor state
+.viminfo
+
+# Sudo status
+.sudo_as_admin_successful
+
+.DS_Store
+
