@@ -56,7 +56,41 @@ function backup_specific {
     perform_backup "$line"
 }
 
-# Handle script arguments for backup operations.
+# Function to perform restore from a parsed line
+function perform_restore {
+    local line_number=$1
+    local line=$(sed -n "${line_number}p" $CONFIG_FILE)
+    local user_host=$(echo "$line" | cut -d':' -f1)
+    local path=$(echo "$line" | cut -d':' -f2-)
+
+    echo "Restoring to $user_host:$path from $BACKUP_DIR/$(basename "$path")"
+    rsync -av "$BACKUP_DIR/$(basename "$path")/" "$user_host:$path"
+    echo "Restore completed for $user_host:$path"
+}
+
+# Function to restore all entries
+function restore_all {
+    echo "Initiating restore for all locations..."
+    local count=0
+    local line_number=1
+    while IFS= read -r line || [[ -n "$line" ]]; do  # Ensure to handle the last line without a newline
+        if [[ -z "$line" ]]; then
+            continue # Skip empty lines
+        fi
+        perform_restore $line_number
+        ((count++))
+        ((line_number++))
+    done < "$CONFIG_FILE"
+    echo "Processed $count locations."
+}
+
+# Function to restore a specific line number
+function restore_specific {
+    local line_number=$1
+    perform_restore $line_number
+}
+
+# Handle script arguments for backup and restore operations.
 case "$1" in
     -B)
         if [ -n "$2" ] && [ "$2" == "-L" ] && [ -n "$3" ]; then
@@ -67,8 +101,17 @@ case "$1" in
             backup_all
         fi
         ;;
+    -R)
+        if [ -n "$2" ] && [ "$2" == "-L" ] && [ -n "$3" ]; then
+            # Call restore function with the specific line number.
+            restore_specific $3
+        else
+            # No -L flag, restore all locations.
+            restore_all
+        fi
+        ;;
     *)
         # Display general usage when no valid arguments are provided.
-        echo "Usage: $0 -B [-L line_number] for backup operations."
+        echo "Usage: $0 -B or -R [-L line_number] for backup or restore operations."
         ;;
 esac
