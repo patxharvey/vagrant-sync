@@ -1,6 +1,3 @@
-# Scripts
-scripts/
-
 # Vagrant-specific ignores
 .vagrant/
 *.box
